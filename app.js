@@ -11,6 +11,8 @@ const app = express();
 
 const Joi = require("joi");
 
+const expireTime = 1000 * 60 * 60; // 1 hour
+
 app.use(express.urlencoded({ extended: true })); // Middleware to parse form data
 
 app.use(express.static('public'));
@@ -19,11 +21,13 @@ app.use(session({
     secret: process.env.NODE_SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    cookie: { maxAge: expireTime },
     store: MongoStore.create({
         mongoUrl: `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_HOST}/${process.env.MONGODB_DATABASE}?retryWrites=true`,
         crypto: {
             secret: process.env.MONGODB_SESSION_SECRET
-        }
+        },
+        ttl: 60 * 60 // 1 hour in seconds
     })
 }));
 
